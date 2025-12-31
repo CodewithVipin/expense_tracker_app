@@ -170,21 +170,24 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       // ➕ ADD EXPENSE FAB
-      floatingActionButton: AnimatedScale(
-        scale: _showFab ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        child: AnimatedOpacity(
-          opacity: _showFab ? 1.0 : 0.0,
+      floatingActionButton: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        child: AnimatedScale(
+          scale: _showFab ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 200),
-          child: FloatingActionButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => const AddExpenseDialog(),
-              );
-            },
-            child: const Icon(Icons.add),
+          curve: Curves.easeOut,
+          child: AnimatedOpacity(
+            opacity: _showFab ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 200),
+            child: FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => const AddExpenseDialog(),
+                );
+              },
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
           ),
         ),
       ),
