@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously, duplicate_ignore
 
+import 'dart:async';
+
 import 'package:expense_tracker/viewmodels/theme_viewmodel.dart';
 import 'package:expense_tracker/views/screen/expense_summary_screen.dart';
 import 'package:expense_tracker/views/screen/manage_categories_screen.dart';
@@ -18,6 +20,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
+  bool _showFab = true;
+  Timer? _fabTimer;
 
   @override
   void initState() {
@@ -26,6 +30,35 @@ class _HomeScreenState extends State<HomeScreen> {
       final vm = context.read<ExpenseViewModel>();
       vm.loadMonthlyBudget();
       vm.loadExpenses();
+      _scrollController.addListener(_handleScroll);
+    });
+  }
+
+  @override
+  void dispose() {
+    _fabTimer?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _handleScroll() {
+    // Hide FAB immediately on scroll
+    if (_showFab) {
+      setState(() {
+        _showFab = false;
+      });
+    }
+
+    // Reset timer
+    _fabTimer?.cancel();
+
+    // Show FAB again after 3 seconds of inactivity
+    _fabTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _showFab = true;
+        });
+      }
     });
   }
 
@@ -137,14 +170,23 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       // ➕ ADD EXPENSE FAB
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (_) => const AddExpenseDialog(),
-          );
-        },
-        child: const Icon(Icons.add, color: Colors.grey),
+      floatingActionButton: AnimatedScale(
+        scale: _showFab ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        child: AnimatedOpacity(
+          opacity: _showFab ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          child: FloatingActionButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => const AddExpenseDialog(),
+              );
+            },
+            child: const Icon(Icons.add),
+          ),
+        ),
       ),
     );
   }
