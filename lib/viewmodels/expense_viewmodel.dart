@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+
 import '../models/expense_model.dart';
 import '../services/expense_service.dart';
+import '../services/settings_service.dart';
 
 class ExpenseViewModel extends ChangeNotifier {
   final ExpenseService _service = ExpenseService();
+  final SettingsService _settingsService = SettingsService();
 
+  // =========================
+  // 🔹 EXPENSE LIST
+  // =========================
   List<Expense> _expenses = [];
   List<Expense> get expenses => _expenses;
 
@@ -14,19 +20,20 @@ class ExpenseViewModel extends ChangeNotifier {
   double _monthlyBudget = 0;
   double get monthlyBudget => _monthlyBudget;
 
-  void updateMonthlyBudget(double value) {
-    _monthlyBudget = value;
+  /// Load budget from DB (call once on startup)
+  Future<void> loadMonthlyBudget() async {
+    final budget = await _settingsService.getMonthlyBudget();
+    debugPrint('📥 Loaded budget from DB: $budget');
+    _monthlyBudget = budget;
     notifyListeners();
   }
 
-  // =========================
-  // 🔹 YEARLY TOTAL
-  // =========================
-  double get yearTotal {
-    final now = DateTime.now();
-    return _expenses
-        .where((e) => e.date.year == now.year)
-        .fold(0, (sum, e) => sum + e.amount);
+  /// Update + persist budget
+  Future<void> updateMonthlyBudget(double value) async {
+    debugPrint('💾 Saving budget: $value');
+    _monthlyBudget = value;
+    await _settingsService.saveMonthlyBudget(value);
+    notifyListeners();
   }
 
   // =========================
@@ -90,6 +97,13 @@ class ExpenseViewModel extends ChangeNotifier {
     final now = DateTime.now();
     return _expenses
         .where((e) => e.date.year == now.year && e.date.month == now.month)
+        .fold(0, (sum, e) => sum + e.amount);
+  }
+
+  double get yearTotal {
+    final now = DateTime.now();
+    return _expenses
+        .where((e) => e.date.year == now.year)
         .fold(0, (sum, e) => sum + e.amount);
   }
 

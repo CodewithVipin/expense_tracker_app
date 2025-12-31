@@ -1,5 +1,9 @@
+import 'package:expense_tracker/views/screen/month_overview_screen.dart';
+import 'package:expense_tracker/views/screen/today_expenses_screen.dart';
+import 'package:expense_tracker/views/screen/year_overview_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../viewmodels/expense_viewmodel.dart';
 
 class ExpenseSummaryScreen extends StatelessWidget {
@@ -8,35 +12,80 @@ class ExpenseSummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<ExpenseViewModel>();
+    final now = DateTime.now();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Expense Summary')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _summaryCard(
-            title: 'Today',
-            amount: vm.todayTotal,
-            icon: Icons.today,
-            color: Colors.blue,
+          // =====================
+          // ☀️ TODAY
+          // =====================
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const TodayExpensesScreen()),
+              );
+            },
+            child: _summaryCard(
+              title: 'Today',
+              amount: vm.todayTotal,
+              icon: Icons.today,
+              color: Colors.blue,
+            ),
           ),
-          _summaryCard(
-            title: 'This Month',
-            amount: vm.monthTotal,
-            icon: Icons.calendar_month,
-            color: Colors.orange,
+
+          // =====================
+          // 📆 THIS MONTH
+          // =====================
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      MonthOverviewScreen(year: now.year, month: now.month),
+                ),
+              );
+            },
+            child: _summaryCard(
+              title: 'This Month',
+              amount: vm.monthTotal,
+              icon: Icons.calendar_month,
+              color: Colors.orange,
+            ),
           ),
-          _summaryCard(
-            title: 'This Year',
-            amount: vm.yearTotal,
-            icon: Icons.event,
-            color: Colors.green,
+
+          // =====================
+          // 🗓️ THIS YEAR
+          // =====================
+          GestureDetector(
+            onTap: () {
+              final currentYear = DateTime.now().year; // ✅ allowed here
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => YearOverviewScreen(year: currentYear),
+                ),
+              );
+            },
+            child: _summaryCard(
+              title: 'This Year',
+              amount: vm.yearTotal,
+              icon: Icons.event,
+              color: Colors.green,
+            ),
           ),
         ],
       ),
     );
   }
 
+  // =====================
+  // 🔹 SUMMARY CARD UI
+  // =====================
   Widget _summaryCard({
     required String title,
     required double amount,

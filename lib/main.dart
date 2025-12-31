@@ -9,6 +9,16 @@ import 'viewmodels/category_viewmodel.dart';
 import 'viewmodels/theme_viewmodel.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
+    ),
+  );
+
   runApp(const ExpenseApp());
 }
 
@@ -25,24 +35,12 @@ class ExpenseApp extends StatelessWidget {
       ],
       child: Consumer<ThemeViewModel>(
         builder: (context, themeVM, _) {
-          SystemChrome.setSystemUIOverlayStyle(
-            const SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              statusBarIconBrightness: Brightness.light,
-              statusBarBrightness: Brightness.dark,
-            ),
-          );
-
-          return AnimatedTheme(
-            data: themeVM.isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            child: MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              home: const HomeScreen(),
-            ),
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            themeMode: themeVM.themeMode,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            home: const HomeScreen(),
           );
         },
       ),

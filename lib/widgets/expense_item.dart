@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../models/expense_model.dart';
 import '../../viewmodels/expense_viewmodel.dart';
@@ -10,20 +11,32 @@ class ExpenseItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formattedDate =
+        '${expense.date.day.toString().padLeft(2, '0')}/'
+        '${expense.date.month.toString().padLeft(2, '0')}/'
+        '${expense.date.year}';
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+
       child: ListTile(
         title: Text(
           expense.category,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500),
         ),
-        subtitle: Text(_formatDate(expense.date)),
+        subtitle: Text(
+          formattedDate,
+          style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade600),
+        ),
+
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               '₹${expense.amount}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(width: 8),
             IconButton(
@@ -60,9 +73,5 @@ class ExpenseItem extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
   }
 }
