@@ -19,6 +19,21 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
 
   final TextEditingController _customController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
+  DateTime _selectedDate = DateTime.now();
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(), // 🚫 future expense allowed nahi
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +83,20 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(labelText: 'Amount'),
             ),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Date: ${_selectedDate.day}-${_selectedDate.month}-${_selectedDate.year}',
+                  ),
+                ),
+                TextButton(onPressed: _pickDate, child: const Text('Change')),
+              ],
+            ),
           ],
         ),
       ),
@@ -85,25 +114,29 @@ class _AddExpenseDialogState extends State<AddExpenseDialog> {
   }
 
   Future<void> _saveExpense(BuildContext context) async {
-    final amount = double.tryParse(_amountController.text) ?? 0;
+    final amount = double.tryParse(_amountController.text.trim()) ?? 0;
     if (amount <= 0) return;
 
     final categoryVM = context.read<CategoryViewModel>();
     final expenseVM = context.read<ExpenseViewModel>();
 
-    String title;
+    String categoryName;
 
-    // 🧠 If custom entered → save category
+    // 🧠 If custom category entered
     if (_customController.text.trim().isNotEmpty) {
-      title = _customController.text.trim();
-      await categoryVM.addCategory(title);
-    } else if (_selectedCategory != null) {
-      title = _selectedCategory!.name;
+      categoryName = _customController.text.trim();
+      await categoryVM.addCategory(categoryName);
+    }
+    // 🧠 If selected from dropdown
+    else if (_selectedCategory != null) {
+      categoryName = _selectedCategory!.name;
     } else {
-      return;
+      return; // ❌ no category selected
     }
 
-    await expenseVM.addExpense(title, amount);
+    // ✅ BACK-DATE SUPPORT (MOST IMPORTANT LINE)
+    await expenseVM.addExpense(categoryName, amount, date: _selectedDate);
+
     Navigator.pop(context);
   }
 }

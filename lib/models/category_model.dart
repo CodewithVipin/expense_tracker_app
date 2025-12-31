@@ -9,6 +9,6 @@ class Category {
   }
 
   factory Category.fromMap(Map<String, dynamic> map) {
-    return Category(id: map['id'], name: map['name']);
+    return Category(id: map['id'] as int?, name: map['name'] as String);
   }
 }

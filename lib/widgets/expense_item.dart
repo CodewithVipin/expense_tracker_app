@@ -14,7 +14,7 @@ class ExpenseItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: ListTile(
         title: Text(
-          expense.title,
+          expense.category,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(_formatDate(expense.date)),
