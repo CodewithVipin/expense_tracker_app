@@ -2,12 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../models/category_model.dart';
-import '../../viewmodels/category_viewmodel.dart';
+import '../models/category_model.dart';
+import '../viewmodels/category_viewmodel.dart';
 
 class EditCategoryDialog extends StatefulWidget {
   final Category category;
-
   const EditCategoryDialog({super.key, required this.category});
 
   @override
@@ -29,7 +28,7 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
       title: const Text('Edit Category'),
       content: TextField(
         controller: _controller,
-        decoration: const InputDecoration(labelText: 'Category Name'),
+        decoration: const InputDecoration(labelText: 'Category name'),
       ),
       actions: [
         TextButton(
@@ -48,7 +47,6 @@ class _EditCategoryDialogState extends State<EditCategoryDialog> {
 
             Navigator.pop(context);
           },
-
           child: const Text('Save'),
         ),
       ],

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../viewmodels/expense_viewmodel.dart';
 
 class ExpenseSummaryScreen extends StatelessWidget {
@@ -15,63 +14,61 @@ class ExpenseSummaryScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _summaryTile(
+          _summaryCard(
             title: 'Today',
             amount: vm.todayTotal,
             icon: Icons.today,
+            color: Colors.blue,
           ),
-          _summaryTile(
-            title: 'Yesterday',
-            amount: vm.yesterdayTotal,
-            icon: Icons.nightlight_round,
-          ),
-          _summaryTile(
+          _summaryCard(
             title: 'This Month',
             amount: vm.monthTotal,
             icon: Icons.calendar_month,
+            color: Colors.orange,
           ),
-          _summaryTile(
-            title: 'Monthly Budget',
-            amount: vm.monthlyBudget,
-            icon: Icons.account_balance_wallet,
+          _summaryCard(
+            title: 'This Year',
+            amount: vm.yearTotal,
+            icon: Icons.event,
+            color: Colors.green,
           ),
-          if (vm.isMonthlyBudgetExceeded)
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: Row(
-                children: const [
-                  Icon(Icons.warning, color: Colors.red),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Monthly budget exceeded!',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );
   }
 
-  Widget _summaryTile({
+  Widget _summaryCard({
     required String title,
     required double amount,
     required IconData icon,
+    required Color color,
   }) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        trailing: Text(
-          '₹ ${amount.toStringAsFixed(2)}',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: color.withValues(alpha: 0.15),
+              child: Icon(icon, color: color),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Text(
+              '₹ ${amount.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       ),
     );

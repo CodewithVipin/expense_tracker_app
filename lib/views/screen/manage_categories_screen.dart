@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+// ignore: unused_import
+import 'package:expense_tracker/models/category_model.dart';
 import 'package:expense_tracker/widgets/edit_category_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,9 +39,21 @@ class ManageCategoriesScreen extends StatelessWidget {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          _confirmDelete(context, vm, category.id!);
+                        icon: const Icon(Icons.delete),
+                        onPressed: () async {
+                          final success = await context
+                              .read<CategoryViewModel>()
+                              .deleteCategory(category);
+
+                          if (!success && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Category is used in expenses. Cannot delete.',
+                                ),
+                              ),
+                            );
+                          }
                         },
                       ),
                     ],
@@ -47,34 +61,6 @@ class ManageCategoriesScreen extends StatelessWidget {
                 );
               },
             ),
-    );
-  }
-
-  void _confirmDelete(
-    BuildContext context,
-    CategoryViewModel vm,
-    int categoryId,
-  ) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete Category'),
-        content: const Text('Do you want to delete this category?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () async {
-              await vm.deleteCategory(categoryId);
-              Navigator.of(ctx).pop();
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
     );
   }
 }

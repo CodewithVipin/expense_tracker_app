@@ -28,8 +28,23 @@ class CategoryService {
     );
   }
 
-  Future<void> deleteCategory(int id) async {
+  Future<bool> deleteCategory(int id, String name) async {
+    final used = await isCategoryUsed(name);
+    if (used) return false;
+
     final db = await _db.database;
     await db.delete('categories', where: 'id = ?', whereArgs: [id]);
+    return true;
+  }
+
+  Future<bool> isCategoryUsed(String name) async {
+    final db = await _db.database;
+
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) FROM expenses WHERE category = ?',
+      [name],
+    );
+
+    return Sqflite.firstIntValue(result)! > 0;
   }
 }

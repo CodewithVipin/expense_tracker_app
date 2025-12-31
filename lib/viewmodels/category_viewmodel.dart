@@ -23,13 +23,17 @@ class CategoryViewModel extends ChangeNotifier {
     await loadCategories();
   }
 
-  Future<void> updateCategory(int id, String name) async {
-    await _service.updateCategory(id, name);
+  Future<void> updateCategory(int id, String newName) async {
+    await _service.updateCategory(id, newName);
     await loadCategories();
   }
 
-  Future<void> deleteCategory(int id) async {
-    await _service.deleteCategory(id);
-    await loadCategories();
+  Future<bool> deleteCategory(Category category) async {
+    final success = await _service.deleteCategory(category.id!, category.name);
+
+    if (success) {
+      await loadCategories();
+    }
+    return success;
   }
 }

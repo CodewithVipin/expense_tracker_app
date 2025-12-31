@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:expense_tracker/views/screen/expense_summary_screen.dart';
+import 'package:expense_tracker/views/screen/manage_categories_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -76,7 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final expenseVM = context.watch<ExpenseViewModel>();
-    final themeVM = context.watch<ThemeViewModel>();
 
     return Scaffold(
       appBar: AppBar(
@@ -84,6 +84,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // ✅ APP BAR ICONS
         actions: [
+          // 🏷️ Manage Categories
+          IconButton(
+            icon: const Icon(Icons.category),
+            tooltip: 'Manage Categories',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const ManageCategoriesScreen(),
+                ),
+              );
+            },
+          ),
           // 📊 Summary icon
           IconButton(
             icon: const Icon(Icons.analytics),
@@ -96,120 +109,116 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           // 🌗 Theme toggle icon
-          IconButton(
-            icon: Icon(themeVM.isDark ? Icons.light_mode : Icons.dark_mode),
-            onPressed: () {
-              themeVM.toggleTheme();
-            },
-          ),
         ],
       ),
 
-      body: Column(
-        children: [
-          Card(
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  const Icon(Icons.account_balance_wallet, size: 28),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Monthly Budget',
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          expenseVM.monthlyBudget == 0
-                              ? 'Not set'
-                              : '₹ ${expenseVM.monthlyBudget.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+      body: RepaintBoundary(
+        child: Column(
+          children: [
+            Card(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  children: [
+                    const Icon(Icons.account_balance_wallet, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Monthly Budget',
+                            style: TextStyle(fontWeight: FontWeight.w600),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // ✏️ Edit Button
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      _showEditBudgetDialog(context, expenseVM);
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // ☀️ Today
-          _summaryCard(
-            icon: Icons.today,
-            title: 'Today',
-            amount: expenseVM.todayTotal,
-          ),
-
-          // ⚠️ Daily budget warning
-          if (expenseVM.isMonthlyBudgetExceeded)
-            Container(
-              margin: const EdgeInsets.all(12),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.warning, color: Colors.red),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Monthly budget exceeded!',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
+                          const SizedBox(height: 4),
+                          Text(
+                            expenseVM.monthlyBudget == 0
+                                ? 'Not set'
+                                : '₹ ${expenseVM.monthlyBudget.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
+
+                    // ✏️ Edit Button
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        _showEditBudgetDialog(context, expenseVM);
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
-          // 🌙 Yesterday
-          _summaryCard(
-            icon: Icons.nightlight_round,
-            title: 'Yesterday',
-            amount: expenseVM.yesterdayTotal,
-          ),
 
-          // 📆 This Month
-          _summaryCard(
-            icon: Icons.calendar_month,
-            title: 'This Month',
-            amount: expenseVM.monthTotal,
-          ),
+            // ☀️ Today
+            _summaryCard(
+              icon: Icons.today,
+              title: 'Today',
+              amount: expenseVM.todayTotal,
+            ),
 
-          const Divider(),
+            // ⚠️ Daily budget warning
+            if (expenseVM.isMonthlyBudgetExceeded)
+              Container(
+                margin: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.warning, color: Colors.red),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Monthly budget exceeded!',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            // 🌙 Yesterday
+            _summaryCard(
+              icon: Icons.nightlight_round,
+              title: 'Yesterday',
+              amount: expenseVM.yesterdayTotal,
+            ),
 
-          // 📋 Expense list (full history)
-          Expanded(
-            child: expenseVM.expenses.isEmpty
-                ? const Center(child: Text('No expenses added yet'))
-                : ListView.builder(
-                    controller: _scrollController,
-                    itemCount: expenseVM.expenses.length,
-                    itemBuilder: (context, index) {
-                      return ExpenseItem(expense: expenseVM.expenses[index]);
-                    },
-                  ),
-          ),
-        ],
+            // 📆 This Month
+            _summaryCard(
+              icon: Icons.calendar_month,
+              title: 'This Month',
+              amount: expenseVM.monthTotal,
+            ),
+
+            const Divider(),
+
+            // 📋 Expense list (full history)
+            Expanded(
+              child: expenseVM.expenses.isEmpty
+                  ? const Center(child: Text('No expenses added yet'))
+                  : ListView.builder(
+                      controller: _scrollController,
+                      itemCount: expenseVM.expenses.length,
+                      itemBuilder: (context, index) {
+                        return ExpenseItem(expense: expenseVM.expenses[index]);
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
 
       // ➕ ADD EXPENSE FAB

@@ -1,5 +1,6 @@
 import 'package:expense_tracker/views/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'core/app_theme.dart';
@@ -18,18 +19,30 @@ class ExpenseApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
         ChangeNotifierProvider(create: (_) => ExpenseViewModel()),
         ChangeNotifierProvider(create: (_) => CategoryViewModel()),
-        ChangeNotifierProvider(create: (_) => ThemeViewModel()),
       ],
       child: Consumer<ThemeViewModel>(
         builder: (context, themeVM, _) {
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.light,
-            darkTheme: AppTheme.dark,
-            themeMode: themeVM.themeMode,
-            home: const HomeScreen(),
+          SystemChrome.setSystemUIOverlayStyle(
+            const SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: Brightness.light,
+              statusBarBrightness: Brightness.dark,
+            ),
+          );
+
+          return AnimatedTheme(
+            data: themeVM.isDark ? AppTheme.darkTheme : AppTheme.lightTheme,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              home: const HomeScreen(),
+            ),
           );
         },
       ),

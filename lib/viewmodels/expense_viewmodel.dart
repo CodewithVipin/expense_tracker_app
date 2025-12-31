@@ -20,6 +20,16 @@ class ExpenseViewModel extends ChangeNotifier {
   }
 
   // =========================
+  // 🔹 YEARLY TOTAL
+  // =========================
+  double get yearTotal {
+    final now = DateTime.now();
+    return _expenses
+        .where((e) => e.date.year == now.year)
+        .fold(0, (sum, e) => sum + e.amount);
+  }
+
+  // =========================
   // 🔹 LOAD EXPENSES
   // =========================
   Future<void> loadExpenses() async {
